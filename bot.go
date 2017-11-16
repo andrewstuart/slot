@@ -3,8 +3,8 @@ package slot
 import (
 	"fmt"
 
-	"github.com/cloudflare/cfssl/log"
 	"github.com/nlopes/slack"
+	log "github.com/sirupsen/logrus"
 )
 
 // A Bot handles a client
@@ -25,12 +25,10 @@ func (b *Bot) Handle(cli *slack.Client) error {
 
 	for {
 		msg := <-rtm.IncomingEvents
-		fmt.Printf("ev = %#v\n", msg.Data)
 		switch ev := msg.Data.(type) {
 		case *slack.ConnectedEvent:
 			b.botID = ev.Info.User.ID
-
-			log.Info("Connected!")
+			log.Debug("Connected!")
 		case *slack.MessageEvent:
 			if ev.BotID == b.botID || ev.User == b.botID {
 				log.Debug("Not responding to our own message")

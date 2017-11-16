@@ -15,7 +15,7 @@ func GetAction(ev *slack.MessageEvent) string {
 		return ""
 	}
 	key := strings.Split(ev.Text, " ")[0]
-	if key[0] != '!' {
+	if len(key) < 1 || key[0] != '!' {
 		return ""
 	}
 
