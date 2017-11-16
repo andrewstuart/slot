@@ -1,49 +1,33 @@
 package slot
 
 import (
-	"regexp"
-	"strings"
-
 	"github.com/nlopes/slack"
 )
 
-type ConditionalAction interface {
+// A MatchResponder conditionally acts on a message
+type MatchResponder interface {
+	Responder
 	Match(*slack.RTM, *slack.MessageEvent) bool
-	Execute(*slack.RTM, *slack.MessageEvent) error
 }
 
-type MatchFunc func(*slack.RTM, *slack.MessageEvent) bool
+// A Responder handles an event
+type Responder interface {
+	Respond(*slack.RTM, *slack.MessageEvent) error
+}
+
+// An ActionFunc is a function that can respond to a slack event
 type ActionFunc func(*slack.RTM, *slack.MessageEvent) error
 
-type regexAction struct {
-	re     *regexp.Regexp
-	action ActionFunc
+// Respond implements Responder.
+func (f ActionFunc) Respond(r *slack.RTM, ev *slack.MessageEvent) error {
+	return f(r, ev)
 }
 
-func (r *regexAction) Match(rtm *slack.RTM, ev *slack.MessageEvent) bool {
-	return r.re.MatchString(ev.Text)
-}
-
-func (r *regexAction) Execute(rtm *slack.RTM, ev *slack.MessageEvent) error {
-	return r.action(rtm, ev)
-}
-
-type BotMentionAction struct {
-	botMentionText string
-	FollowingText  string
-	Action         ActionFunc
-}
-
-func (b *BotMentionAction) Match(rtm *slack.RTM, ev *slack.MessageEvent) bool {
-	if b.botMentionText == "" {
-		if id, err := rtm.GetUserIdentity(); err == nil {
-			b.botMentionText = "@" + id.User.Name
-		}
+// MaybeRespond checks if a Responder is a MatchResponder and conditionally
+// exits if there is no match.
+func MaybeRespond(r *slack.RTM, ev *slack.MessageEvent, res Responder) error {
+	if mr, ok := res.(MatchResponder); ok && !mr.Match(r, ev) {
+		return nil
 	}
-
-	return strings.Contains(ev.Text, b.botMentionText+" "+b.FollowingText)
-}
-
-func (b *BotMentionAction) Execute(rtm *slack.RTM, ev *slack.MessageEvent) error {
-	return b.Action(rtm, ev)
+	return res.Respond(r, ev)
 }
