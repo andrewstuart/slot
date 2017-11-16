@@ -6,15 +6,19 @@ import (
 	"github.com/nlopes/slack"
 )
 
-type RegexAction struct {
-	re     *regexp.Regexp
-	action Responder
+// RegexResponder matches a regex against an incoming string and executes a
+// response if a match occurred
+type RegexResponder struct {
+	Regexp    *regexp.Regexp
+	Responder Responder
 }
 
-func (r *RegexAction) Match(rtm *slack.RTM, ev *slack.MessageEvent) bool {
-	return r.re.MatchString(ev.Text)
+// Match implements MatchResponder
+func (r *RegexResponder) Match(rtm *slack.RTM, ev *slack.MessageEvent) bool {
+	return r.Regexp.MatchString(ev.Text)
 }
 
-func (r *RegexAction) Respond(rtm *slack.RTM, ev *slack.MessageEvent) error {
-	return r.action.Respond(rtm, ev)
+// Respond implements Responder
+func (r *RegexResponder) Respond(rtm *slack.RTM, ev *slack.MessageEvent) error {
+	return r.Responder.Respond(rtm, ev)
 }

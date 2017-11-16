@@ -6,7 +6,7 @@ import (
 	"github.com/nlopes/slack"
 )
 
-// BotMentionAction
+// BotMentionAction executes a responder if the bot's name is @mentioned
 type BotMentionAction struct {
 	botMentionText string
 	FollowingText  string
