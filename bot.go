@@ -7,17 +7,22 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// PresenceHandler handles updates to PresenceChangeEvents
+type PresenceHandler interface {
+	Handle(*slack.PresenceChangeEvent, *slack.User)
+}
+
 // A Bot handles a client
 type Bot struct {
-	Handlers []Responder
+	Responders []Responder
 
 	botID string
 }
 
 // Handle manages an RTM based on the configured Handlers
 func (b *Bot) Handle(cli *slack.Client) error {
-	if b.Handlers == nil {
-		return fmt.Errorf("bot had no configured handlers")
+	if b.Responders == nil {
+		return fmt.Errorf("bot had no configured Responders")
 	}
 
 	rtm := cli.NewRTM()
@@ -29,14 +34,20 @@ func (b *Bot) Handle(cli *slack.Client) error {
 		case *slack.ConnectedEvent:
 			b.botID = ev.Info.User.ID
 			log.Debug("Connected!")
+		case *slack.PresenceChangeEvent:
+			ui, err := rtm.GetUserInfo(ev.User)
+			if err != nil {
+				log.Error(err)
+				continue
+			}
 		case *slack.MessageEvent:
 			if ev.BotID == b.botID || ev.User == b.botID {
 				log.Debug("Not responding to our own message")
 			}
 			log.Debug("%s: %q", ev.User, ev.Text)
 
-			for i := range b.Handlers {
-				err := MaybeRespond(rtm, ev, b.Handlers[i])
+			for i := range b.Responders {
+				err := MaybeRespond(rtm, ev, b.Responders[i])
 				if err != nil {
 					log.Error("bot handler error", err)
 				}
