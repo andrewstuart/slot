@@ -17,8 +17,15 @@ func TestActionString(t *testing.T) {
 		{"", ""},
 	}
 
+	am := ActionMap{}
+
 	for _, entry := range tab {
-		asrt.Equal(entry[1], GetAction(&slack.MessageEvent{Msg: slack.Msg{Type: slack.TYPE_MESSAGE, Text: entry[0]}}))
+		ev := &slack.MessageEvent{Msg: slack.Msg{Type: slack.TYPE_MESSAGE, Text: entry[0]}}
+		asrt.Equal(entry[1], GetAction(ev))
+
+		asrt.False(am.Match(nil, ev))
+		am[entry[0]] = TextResponder(entry[1])
+		asrt.Equal(entry[1] != "", am.Match(nil, ev))
 	}
 
 	asrt.Equal("", GetAction(&slack.MessageEvent{Msg: slack.Msg{Type: slack.TYPE_IM, Text: "!foo"}}))

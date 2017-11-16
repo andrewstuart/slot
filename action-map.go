@@ -3,8 +3,6 @@ package slot
 import (
 	"strings"
 
-	"log"
-
 	"github.com/nlopes/slack"
 )
 
@@ -32,7 +30,6 @@ func (m ActionMap) Match(r *slack.RTM, ev *slack.MessageEvent) bool {
 	if action == "" {
 		return false
 	}
-	log.Println(action)
 
 	// Return whether map contains the action
 	_, ok := m[action]

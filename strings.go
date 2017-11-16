@@ -2,11 +2,11 @@ package slot
 
 import "github.com/nlopes/slack"
 
-// PlainTextResponder always responds with a string
-type PlainTextResponder string
+// TextResponder always responds with a string
+type TextResponder string
 
 // Respond implements Responder
-func (p PlainTextResponder) Respond(r *slack.RTM, ev *slack.MessageEvent) error {
+func (p TextResponder) Respond(r *slack.RTM, ev *slack.MessageEvent) error {
 	r.SendMessage(&slack.OutgoingMessage{
 		Channel: ev.Channel,
 		Text:    string(p),
