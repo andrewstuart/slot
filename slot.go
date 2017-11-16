@@ -7,7 +7,12 @@ import (
 	"github.com/nlopes/slack"
 )
 
-type matchFunc func(*slack.RTM, *slack.MessageEvent) bool
+type ConditionalAction interface {
+	Match(*slack.RTM, *slack.MessageEvent) bool
+	Execute(*slack.RTM, *slack.MessageEvent) error
+}
+
+type MatchFunc func(*slack.RTM, *slack.MessageEvent) bool
 type ActionFunc func(*slack.RTM, *slack.MessageEvent) error
 
 type regexAction struct {
