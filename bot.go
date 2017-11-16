@@ -14,7 +14,12 @@ type Bot struct {
 	botID string
 }
 
+// Handle manages an RTM based on the configured Handlers
 func (b *Bot) Handle(cli *slack.Client) error {
+	if b.Handlers == nil {
+		return fmt.Errorf("bot had no configured handlers")
+	}
+
 	rtm := cli.NewRTM()
 	go rtm.ManageConnection()
 
