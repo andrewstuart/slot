@@ -24,8 +24,8 @@ func TestActionString(t *testing.T) {
 		asrt.Equal(entry[1], GetAction(ev))
 
 		asrt.False(am.Match(nil, ev))
-		am[entry[0]] = TextResponder(entry[1])
-		asrt.Equal(entry[1] != "", am.Match(nil, ev))
+		am[entry[1]] = TextResponder(entry[1])
+		asrt.Equal(entry[1] != "", am.Match(nil, ev), "match was wrong for %s", entry[0])
 	}
 
 	asrt.Equal("", GetAction(&slack.MessageEvent{Msg: slack.Msg{Type: slack.TYPE_IM, Text: "!foo"}}))
