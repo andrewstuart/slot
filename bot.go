@@ -36,10 +36,12 @@ func (b *Bot) Handle(cli *slack.Client) error {
 			log.Debug("%s: %q", ev.User, ev.Text)
 
 			for i := range b.Responders {
-				err := MaybeRespond(rtm, ev, b.Responders[i])
-				if err != nil {
-					log.Error("bot handler error", err)
-				}
+				go func(rtm *slack.RTM, ev *slack.MessageEvent, r Responder) {
+					err := MaybeRespond(rtm, ev, r)
+					if err != nil {
+						log.Error("bot handler error", err)
+					}
+				}(rtm, ev, b.Responders[i])
 			}
 		case *slack.OutgoingErrorEvent:
 			log.Error("Outgoing event error encountered", ev)
