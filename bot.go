@@ -7,11 +7,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// PresenceHandler handles updates to PresenceChangeEvents
-type PresenceHandler interface {
-	Handle(*slack.PresenceChangeEvent, *slack.User)
-}
-
 // A Bot handles a client
 type Bot struct {
 	Responders []Responder
@@ -34,12 +29,6 @@ func (b *Bot) Handle(cli *slack.Client) error {
 		case *slack.ConnectedEvent:
 			b.botID = ev.Info.User.ID
 			log.Debug("Connected!")
-		case *slack.PresenceChangeEvent:
-			ui, err := rtm.GetUserInfo(ev.User)
-			if err != nil {
-				log.Error(err)
-				continue
-			}
 		case *slack.MessageEvent:
 			if ev.BotID == b.botID || ev.User == b.botID {
 				log.Debug("Not responding to our own message")
