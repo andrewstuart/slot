@@ -15,11 +15,11 @@ type Responder interface {
 	Respond(*slack.RTM, *slack.MessageEvent) error
 }
 
-// An ActionFunc is a function that can respond to a slack event
-type ActionFunc func(*slack.RTM, *slack.MessageEvent) error
+// An ResponderFunc is a function that can respond to a slack event
+type ResponderFunc func(*slack.RTM, *slack.MessageEvent) error
 
 // Respond implements Responder.
-func (f ActionFunc) Respond(r *slack.RTM, ev *slack.MessageEvent) error {
+func (f ResponderFunc) Respond(r *slack.RTM, ev *slack.MessageEvent) error {
 	return f(r, ev)
 }
 
