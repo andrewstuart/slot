@@ -20,4 +20,6 @@ func TestActionString(t *testing.T) {
 	for _, entry := range tab {
 		asrt.Equal(entry[1], GetAction(&slack.MessageEvent{Msg: slack.Msg{Type: slack.TYPE_MESSAGE, Text: entry[0]}}))
 	}
+
+	asrt.Equal("", GetAction(&slack.MessageEvent{Msg: slack.Msg{Type: slack.TYPE_IM, Text: "!foo"}}))
 }
